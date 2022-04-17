@@ -9,6 +9,7 @@ import express from "express";
 import { buildSchema } from "type-graphql";
 import { PostResolver } from "./resolvers/post";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import { UserResolver } from "./resolvers/user";
 
 require("dotenv").config();
 
@@ -21,9 +22,10 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [PostResolver],
+      resolvers: [PostResolver, UserResolver],
       validate: false,
     }),
+    context: () => ({ em: orm.em }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()], // Graphql playground landingpage
   });
 

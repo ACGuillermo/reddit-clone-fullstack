@@ -6,7 +6,8 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "nodemon dist/index.js",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "create:migration": "mikro-orm migration:create"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,7 @@
     "@mikro-orm/postgresql": "^5.1.2",
     "apollo-server-core": "^3.6.7",
     "apollo-server-express": "^3.6.7",
+    "argon2": "^0.28.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "graphql": "^15.3.0",
