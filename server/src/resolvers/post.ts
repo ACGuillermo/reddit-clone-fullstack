@@ -31,7 +31,7 @@ export class PostResolver {
   async updatePost(
     @Ctx() { em }: appContext,
     @Arg("id", () => Int) id: number,
-    @Arg("title", () => String) title: string
+    @Arg("title", () => String, { nullable: true }) title: string
   ): Promise<Post | null> {
     const post = await em.findOne(Post, { id });
 
@@ -39,9 +39,11 @@ export class PostResolver {
       return null;
     }
 
-    if (post.title !== title) {
-      post.title = title;
-      await em.persistAndFlush(post);
+    if (title) {
+      if (post.title !== title) {
+        post.title = title;
+        await em.persistAndFlush(post);
+      }
     }
 
     return post;

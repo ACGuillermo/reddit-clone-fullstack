@@ -6,6 +6,7 @@ import {
   InputType,
   Mutation,
   ObjectType,
+  Query,
   Resolver,
 } from "type-graphql";
 import { User } from "../entities/User";
@@ -39,18 +40,60 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-  @Mutation(() => User)
+  @Query(() => User, { nullable: true })
+  async me(
+    @Ctx() { em }: appContext,
+    @Arg("id") id: number
+  ): Promise<User | null> {
+    const user = em.findOne(User, { id });
+    if (!user) return null;
+    return user;
+  }
+
+  @Mutation(() => UserResponse)
   async register(
     @Ctx() { em }: appContext,
     @Arg("input") input: UsernamePasswordInput
-  ): Promise<User> {
+  ): Promise<UserResponse> {
     const hashedPassword = await argon2.hash(input.password);
+    const existingUser = await em.findOne(User, {
+      username: input.username.toLocaleLowerCase(),
+    });
+
+    if (existingUser) {
+      return {
+        errors: [{ field: "username", message: "Username already in use." }],
+      };
+    }
+
+    if (input.username.length <= 3) {
+      return {
+        errors: [
+          {
+            field: "username",
+            message: "Username must be 4 characters long minimum.",
+          },
+        ],
+      };
+    }
+
+    if (input.password.length <= 3) {
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "Password must be 4 characters long minimum.",
+          },
+        ],
+      };
+    }
+
     const user = em.create(User, {
       username: input.username.toLowerCase(),
       password: hashedPassword,
     });
     await em.persistAndFlush(user);
-    return user;
+    return { user };
   }
 
   @Mutation(() => UserResponse)
