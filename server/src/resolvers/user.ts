@@ -49,7 +49,7 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async register(
-    @Ctx() { em }: appContext,
+    @Ctx() { em, req }: appContext,
     @Arg("input") input: UsernamePasswordInput
   ): Promise<UserResponse> {
     const hashedPassword = await argon2.hash(input.password);
@@ -90,6 +90,8 @@ export class UserResolver {
       password: hashedPassword,
     });
     await em.persistAndFlush(user);
+    // Auto login
+    req.session!.userId = user.id;
     return { user };
   }
 
