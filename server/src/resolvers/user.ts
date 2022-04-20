@@ -41,12 +41,9 @@ class UserResponse {
 @Resolver()
 export class UserResolver {
   @Query(() => User, { nullable: true })
-  async me(
-    @Ctx() { em }: appContext,
-    @Arg("id") id: number
-  ): Promise<User | null> {
-    const user = em.findOne(User, { id });
-    if (!user) return null;
+  async currentUser(@Ctx() { em, req }: appContext): Promise<User | null> {
+    if (!req.session.userId) return null;
+    const user = await em.findOne(User, { id: req.session.userId });
     return user;
   }
 
@@ -98,7 +95,7 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async login(
-    @Ctx() { em }: appContext,
+    @Ctx() { em, req }: appContext,
     @Arg("input") input: UsernamePasswordInput
   ): Promise<UserResponse> {
     const user = await em.findOne(User, {
@@ -120,6 +117,7 @@ export class UserResolver {
         errors: [{ field: "password", message: "Incorrect password" }],
       };
     }
+    req.session!.userId = user.id;
     return { user };
   }
 }
