@@ -14,6 +14,7 @@ import session from "express-session";
 import { createClient } from "redis";
 import connectRedis from "connect-redis";
 import { appContext } from "./types";
+import cors from "cors";
 
 // Declaration merging
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/express-session/index.d.ts#L23
@@ -25,16 +26,23 @@ declare module "express-session" {
 
 require("dotenv").config();
 
-const RedisStore = connectRedis(session);
-const redisClient = createClient({ legacyMode: true });
-redisClient.connect().catch(console.error);
-
 const main = async () => {
   // ORM & Migrations setup
   const orm = await MikroORM.init<PostgreSqlDriver>(mikroConfig);
   await orm.getMigrator().up();
 
   const app = express();
+
+  const RedisStore = connectRedis(session);
+  const redisClient = createClient({ legacyMode: true });
+  redisClient.connect().catch(console.error);
+
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
 
   // Configure redis session
   app.use(
@@ -72,7 +80,10 @@ const main = async () => {
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
 
   app.listen(4000, () => {
     console.log("Server listening to port:4000");
