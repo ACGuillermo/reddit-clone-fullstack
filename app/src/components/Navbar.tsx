@@ -45,14 +45,14 @@ export default function Nav() {
   if (fetching) {
     // Loading
     navItems = (
-      <Stack direction={"row"} ml={4} spacing={4}>
+      <>
         <NextLink href="/login" passHref>
           <NavLink>Login</NavLink>
         </NextLink>
         <NextLink href="/register" passHref>
           <NavLink>Sign up</NavLink>
         </NextLink>
-      </Stack>
+      </>
     );
   } else if (data?.currentUser) {
     // User logged
@@ -93,29 +93,36 @@ export default function Nav() {
   } else {
     // User not logged
     navItems = (
-      <Stack direction={"row"} ml={4} spacing={4}>
+      <>
         <NextLink href="/login" passHref>
           <NavLink>Login</NavLink>
         </NextLink>
         <NextLink href="/register" passHref>
           <NavLink>Sign up</NavLink>
         </NextLink>
-      </Stack>
+      </>
     );
   }
   return (
     <>
       <Box bg={useColorModeValue("gray.100", "gray.900")} px={4}>
-        <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
+        <Flex
+          maxWidth={"7xl"}
+          width={"100%"}
+          mx={"auto"}
+          h={16}
+          alignItems={"center"}
+          justifyContent={"space-between"}
+        >
           <Box>Logo</Box>
 
           <Flex alignItems={"center"}>
-            <Stack direction={"row"} spacing={7}>
+            <Stack direction={"row"} spacing={4}>
               <Button onClick={toggleColorMode}>
                 {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               </Button>
+              {navItems}
             </Stack>
-            {navItems}
           </Flex>
         </Flex>
       </Box>

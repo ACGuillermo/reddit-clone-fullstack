@@ -10,8 +10,8 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
+import { useRouter } from "next/router";
 import React from "react";
-import { useMutation } from "urql";
 import InputField from "../components/InputField";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
@@ -20,6 +20,7 @@ interface loginProps {}
 
 const login: React.FC<loginProps> = ({}) => {
   const [, login] = useLoginMutation();
+  const router = useRouter();
   return (
     <Flex justify={"center"}>
       <Stack spacing={8} mx={"auto"} w="100%" maxW={"lg"} py={12} px={6}>
@@ -39,6 +40,8 @@ const login: React.FC<loginProps> = ({}) => {
                 const response = await login(value);
                 if (response.data?.login.errors) {
                   setErrors(toErrorMap(response.data.login.errors));
+                } else if (response.data?.login.user) {
+                  router.push("/");
                 }
               }}
             >
