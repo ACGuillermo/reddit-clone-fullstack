@@ -13,25 +13,13 @@ import { Formik, Form } from "formik";
 import React from "react";
 import { useMutation } from "urql";
 import InputField from "../components/InputField";
+import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 
 interface loginProps {}
 
 const login: React.FC<loginProps> = ({}) => {
-  const REGISTER_MUTATION = `mutation Register($username: String!, $password: String!) {
-        register(input: { username: $username, password: $password }) {
-          user {
-            id
-            username
-          }
-          errors {
-            message
-            field
-          }
-        }
-      }
-      `;
-  const [, register] = useMutation(REGISTER_MUTATION);
+  const [, login] = useLoginMutation();
   return (
     <Flex justify={"center"}>
       <Stack spacing={8} mx={"auto"} w="100%" maxW={"lg"} py={12} px={6}>
@@ -48,11 +36,9 @@ const login: React.FC<loginProps> = ({}) => {
             <Formik
               initialValues={{ username: "", password: "" }}
               onSubmit={async (value, { setErrors }) => {
-                console.log(value);
-                const response = await register(value);
-                if (response.data?.register.errors) {
-                  console.log(response.data.register.errors);
-                  setErrors(toErrorMap(response.data.register.errors));
+                const response = await login(value);
+                if (response.data?.login.errors) {
+                  setErrors(toErrorMap(response.data.login.errors));
                 }
               }}
             >

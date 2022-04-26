@@ -10,6 +10,7 @@ interface FieldError {
  * {field: "username", message: "Username already in use"}
  *
  */
+
 export const toErrorMap = (errors: FieldError[]) => {
   const errorMap: Record<string, string> = {};
   errors.forEach(({ field, message }) => {

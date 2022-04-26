@@ -11,10 +11,13 @@ import {
   Text,
 } from "@chakra-ui/react";
 import InputField from "../components/InputField";
+import { useRegisterMutation } from "../generated/graphql";
+import { toErrorMap } from "../utils/toErrorMap";
 
 interface registerProps {}
 
 const Register: React.FC<registerProps> = ({}) => {
+  const [, register] = useRegisterMutation();
   return (
     <Flex justify={"center"} bg={useColorModeValue("gray.50", "gray.800")}>
       <Stack spacing={8} mx={"auto"} w="100%" maxW={"lg"} py={12} px={6}>
@@ -30,7 +33,12 @@ const Register: React.FC<registerProps> = ({}) => {
           <Stack spacing={4}>
             <Formik
               initialValues={{ username: "", password: "" }}
-              onSubmit={(value) => console.log(value)}
+              onSubmit={async (value, { setErrors }) => {
+                const response = await register(value);
+                if (response.data?.register.errors) {
+                  setErrors(toErrorMap(response.data.register.errors));
+                }
+              }}
             >
               {({ isSubmitting }) => (
                 <Form>
