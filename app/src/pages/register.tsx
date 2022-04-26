@@ -13,11 +13,13 @@ import {
 import InputField from "../components/InputField";
 import { useRegisterMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
+import { useRouter } from "next/router";
 
 interface registerProps {}
 
 const Register: React.FC<registerProps> = ({}) => {
   const [, register] = useRegisterMutation();
+  const router = useRouter();
   return (
     <Flex justify={"center"} bg={useColorModeValue("gray.50", "gray.800")}>
       <Stack spacing={8} mx={"auto"} w="100%" maxW={"lg"} py={12} px={6}>
@@ -37,6 +39,8 @@ const Register: React.FC<registerProps> = ({}) => {
                 const response = await register(value);
                 if (response.data?.register.errors) {
                   setErrors(toErrorMap(response.data.register.errors));
+                } else if (response.data?.register.user) {
+                  router.push("/");
                 }
               }}
             >
