@@ -91,7 +91,7 @@ export class UserResolver {
     });
     await em.persistAndFlush(user);
     // Auto login
-    req.session!.userId = user.id;
+    req.session.userId = user.id;
     return { user };
   }
 
@@ -119,7 +119,7 @@ export class UserResolver {
         errors: [{ field: "password", message: "Incorrect password" }],
       };
     }
-    req.session!.userId = user.id;
+    req.session.userId = user.id;
     return { user };
   }
 }
